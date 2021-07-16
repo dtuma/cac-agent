@@ -1,7 +1,9 @@
 package com.moesol.cac.agent.selector;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -33,6 +35,7 @@ public class SwingIdentityKeyChooser implements IdentityKeyChooser {
 	private String choosenAlias;
 	private Timer maybeShowBusy = new Timer(1000, e -> showBusyNow());
 	private JDialog busy;
+	public Component parent;
 	
 	public SwingIdentityKeyChooser(IdentityKeyListProvider provider) {
 		this.provider = provider;
@@ -154,7 +157,16 @@ public class SwingIdentityKeyChooser implements IdentityKeyChooser {
 		String cancel = "Cancel";
 		pane.setOptions(new Object[] { cancel });
 
-		final JDialog dialog = pane.createDialog("Select Identity");
+		final JDialog dialog = pane.createDialog(parent, "Select Identity");
+		if (parent != null) {
+        		Window w;
+        		if (parent instanceof Window)
+        		    w = (Window) parent;
+        		else
+        		    w = SwingUtilities.getWindowAncestor(parent);
+        		if (w != null)
+        		    dialog.setIconImages(w.getIconImages());
+		}
 		bindArrowKeys(dialog);
 		panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "selectKey");
 		panel.getActionMap().put("selectKey", new AbstractAction() {
